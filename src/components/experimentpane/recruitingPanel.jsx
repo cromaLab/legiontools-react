@@ -1,9 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { LoginActions } from '../../redux/actions/actions.js'
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
-import FormControl from 'react-bootstrap/FormControl';
 
 
 class RecruitingPanel extends React.Component {
