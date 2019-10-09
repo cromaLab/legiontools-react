@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import HideView from './hide_view';
+import HideView from '../hide_view';
 import InfoModal from '../infoModal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
