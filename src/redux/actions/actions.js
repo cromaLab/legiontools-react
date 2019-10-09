@@ -1,7 +1,7 @@
 import { LoginActions } from './loginActions.js';
-import { LivePaneActions } from './livePaneActions.js';
+import { ExperimentPaneActions } from './experimentPaneActions.js';
 
 export default {
     LoginActions,
-    LivePaneActions
+    ExperimentPaneActions
 }
