@@ -9,9 +9,14 @@ class LivePane extends React.Component {
             <div>
                 <HideView />
                 <h1>Overview</h1>
+                {this.props.retainerMode ? <h2>retainer mode</h2> : <h2>direct mode</h2>}
             </div>
         );
     }
 }
 
-export default connect(null, null)(LivePane);
+const mapStateToProps = state => ({
+    retainerMode: (state.experimentPaneReducers.setRetainerMode.enabled)
+})
+
+export default connect(mapStateToProps, null)(LivePane);

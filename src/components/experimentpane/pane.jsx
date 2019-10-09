@@ -3,13 +3,13 @@ import { connect } from 'react-redux';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import LoadPanel from './loadPanel';
-import RecruitingPanel from './recruitingPanel';
+import RecruitingPanel from './recruiting/recruitingPanel';
 
 
 class ExperimentPane extends React.Component {
     render() {
         return (
-            <Tabs defaultActiveKey="experiment" id="editor-pane">
+            <Tabs defaultActiveKey="recruiting" id="editor-pane">
                 <Tab eventKey="experiment" title="Load Panel">
                     <LoadPanel />
                 </Tab>

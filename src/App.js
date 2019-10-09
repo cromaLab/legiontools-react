@@ -32,7 +32,7 @@ function App() {
         </Navbar.Collapse>
       </Navbar>
       <Provider store={store}>
-        <LoginModal />
+        {/* <LoginModal /> */}
         <CardGroup className="w-75 d-flex mx-auto mt-5">
           <Card body className="mx-3">
             <ExperimentPane />

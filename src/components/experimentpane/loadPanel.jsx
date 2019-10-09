@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { LivePaneActions } from '../../redux/actions/livePaneActions';
+import { ExperimentPaneActions } from '../../redux/actions/experimentPaneActions';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col'
@@ -9,7 +9,7 @@ class LoadPanel extends React.Component {
     render() {
         return (
             <div className="mt-3">
-                <h2>Load an old experiment</h2>
+                <h3>Load an old experiment</h3>
 
                 <div className="my-3">
                     <Button variant="info" className="mx-1">Copy</Button>
@@ -94,11 +94,11 @@ class LoadPanel extends React.Component {
 
 const mapStateToProps = state => ({
     tokens: (state.loginReducers.setLoginTokens.tokens),
-    livePaneEnabled: (state.livePaneReducers.enableLivePane.enabled)
+    livePaneEnabled: (state.experimentPaneReducers.enableLivePane.enabled)
 })
 
 const mapDispatchToProps = dispatch => ({
-    enableLivePane: enabled => dispatch(LivePaneActions.enableLivePane(enabled))
+    enableLivePane: enabled => dispatch(ExperimentPaneActions.enableLivePane(enabled))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoadPanel);

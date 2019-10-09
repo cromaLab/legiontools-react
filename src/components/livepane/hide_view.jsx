@@ -10,7 +10,7 @@ class HideView extends React.Component {
     }
 }
 const mapStateToProps = state => ({
-    enabled: (state.livePaneReducers.enableLivePane.enabled)
+    enabled: (state.experimentPaneReducers.enableLivePane.enabled)
 })
 
 export default connect(mapStateToProps, null)(HideView);
