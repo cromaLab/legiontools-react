@@ -36,3 +36,11 @@
   cursor: not-allowed;
   position: absolute;
 }
+
+.form-label {
+  font-weight: bold;
+}
+
+.btn {
+  margin: 1rem!important;
+}
