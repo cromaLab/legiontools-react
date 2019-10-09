@@ -9,7 +9,7 @@ import RecruitingPanel from './recruiting/recruitingPanel';
 class ExperimentPane extends React.Component {
     render() {
         return (
-            <Tabs defaultActiveKey="recruiting" id="editor-pane">
+            <Tabs defaultActiveKey="experiment" id="editor-pane">
                 <Tab eventKey="experiment" title="Load Panel">
                     <LoadPanel />
                 </Tab>

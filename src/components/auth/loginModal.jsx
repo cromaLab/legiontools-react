@@ -49,11 +49,11 @@ class LoginModal extends React.Component {
                         When you have HITS posted through LegionTools, we recommend <b>not reloading the page</b> as this may cause issues with LegionTools retaining session data. Fortunately, if you try to reload the page, you will be prompted to confirm and can select "Cancel" to cancel the reload.
                         </p>
 
-                        <FormControl ref="loginAccessKey" type="text" placeholder="Access Key" />
-                        <FormControl ref="loginSecretKey" type="text" placeholder="Secret Key" />
+                        <FormControl className="my-2" ref="loginAccessKey" type="text" placeholder="Access Key" />
+                        <FormControl className="my-2" ref="loginSecretKey" type="text" placeholder="Secret Key" />
 
                         <p>
-                        LegionTools was originally developed by Mitchell Gordon and Walter Lasecki at the University of Rochester, and is currently maintained by Sai Gouravajhala, Alan Lundgard, and Walter Lasecki. It was rewritten in ReactJS by Eashwar Mohan.
+                        LegionTools was originally developed by Mitchell Gordon and Walter Lasecki at the University of Rochester, and is currently maintained by Sai Gouravajhala, Alan Lundgard, and Walter Lasecki. The React/Redux rewrite was done by Eashwar Mohan.
                         </p>
                     </Modal.Body>
                     <Modal.Footer>

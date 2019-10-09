@@ -30,7 +30,7 @@ class InfoModal extends React.Component {
         
         const paragraphs = text.map( (paragraph, index) => {
             return(
-                <p key="{index}">
+                <p key={index}>
                     {paragraph}
                 </p>
             );
