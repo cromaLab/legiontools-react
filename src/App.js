@@ -14,7 +14,7 @@ function App() {
   return (
     <div className="App">
       <Navbar bg="light" className="justify-content-between">
-        <Navbar.Brand href="#home">
+        <Navbar.Brand href="/">
           LEGIONTOOLS
         </Navbar.Brand>
         <Navbar.Collapse className="justify-content-end">
