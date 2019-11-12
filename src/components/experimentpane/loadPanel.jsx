@@ -11,27 +11,46 @@ class LoadPanel extends React.Component {
 
         // state tracks the values within the form elements
         this.state = {
-            form: {
+            textForm: {
                 experimentName: "",
                 hitTitle: "",
                 hitDescription: "",
                 hitKeywords: "",
                 workerCountry: "All",
                 minApproved: ""
-            }
+            },
+            dropdownValue: "Select an experiment name"
         };
 
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleTextInputChange = this.handleTextInputChange.bind(this);
+        this.handleDropdownChange = this.handleDropdownChange.bind(this);
+    }
+
+    handleDropdownChange(event) {
+        this.setState({dropdownValue: event.target.value}, () => {
+            // ignore default value
+            if (this.state.dropdownValue !== "Select an experiment name") {
+                // TODO: thunk that uses experimentName=this.state.dropdownValue in order to grab info about the currExperiment
+                this.props.setCurrExperiment({
+                    experimentName: this.state.dropdownValue,
+                    hitTitle: "",
+                    hitDescription: "",
+                    hitKeywords: "",
+                    workerCountry: "",
+                    minApproved: ""
+                });
+            }
+        });
     }
 
     handleTextInputChange(event) {
         let field = {};
         field[event.target.id] = event.target.value;
 
-        // works because this.state.form's keys match the form's controlIds
-        this.setState({form: {...this.state.form, ...field}}, () => {
-            console.log(this.state.form);
+        // works because this.state.textForm's keys match the form's controlIds
+        this.setState({textForm: {...this.state.textForm, ...field}}, () => {
+            console.log(this.state.textForm);
         });
     }
 
@@ -40,18 +59,18 @@ class LoadPanel extends React.Component {
 
         // if no currExperiment is currently set, then add the new experiment to experimentNames
         if (!this.props.currExperiment) {
-            this.props.addExperimentName(this.state.form.experimentName);
+            this.props.addExperimentName(this.state.textForm.experimentName);
         }
 
         // TODO: thunk should save new experiment to database if no currExperiment exists, else just update existing experiment in database
         // TODO: how should hitKeywords be represented, array or string? similar Q's for workerCountry and minApproved
         this.props.setCurrExperiment({
-            experimentName: this.state.form.experimentName,
-            hitTitle: this.state.form.hitTitle,
-            hitDescription: this.state.form.hitDescription,
-            hitKeywords: this.state.form.hitKeywords,
-            workerCountry: this.state.form.workerCountry,
-            minApproved: this.state.form.minApproved
+            experimentName: this.state.textForm.experimentName,
+            hitTitle: this.state.textForm.hitTitle,
+            hitDescription: this.state.textForm.hitDescription,
+            hitKeywords: this.state.textForm.hitKeywords,
+            workerCountry: this.state.textForm.workerCountry,
+            minApproved: this.state.textForm.minApproved
         });
 
         // once experiment is set, enable live pane
@@ -59,6 +78,8 @@ class LoadPanel extends React.Component {
         if (!this.props.livePaneEnabled) {
             this.props.enableLivePane(true);
         }
+
+        // TODO: change the dropdown menu's value accordingly
     }
 
     render() {
@@ -69,9 +90,9 @@ class LoadPanel extends React.Component {
                 <div className="my-3">
                     <Button variant="info" className="mx-1">Copy</Button>
                     <Button variant="danger" className="mx-1">Delete</Button>
-                   <Form.Group controlId="loadOldExperiment" className="my-2">
-                        <Form.Control as="select">
-                            <option>-----</option>
+                    <Form.Group controlId="loadOldExperiment" className="my-2">
+                        <Form.Control as="select" value={this.state.dropdownValue} onChange={this.handleDropdownChange}>
+                            <option>Select an experiment name</option>
                             <option>1</option>
                             <option>2</option>
                             <option>3</option>
@@ -83,7 +104,7 @@ class LoadPanel extends React.Component {
                 <h3>Or create a new experiment</h3>
 
                 {/* TODO: add validation (minApproved should be number, etc) */}
-                <Form onSubmit={this.handleSubmit} onChange={this.handleTextInputChange}>
+                <Form onSubmit={this.handleSubmit} value={this.state.textForm} onChange={this.handleTextInputChange}>
                     <Form.Group controlId="experimentName">
                         <Form.Label>Experiment Name (Remember This)</Form.Label>
                         {/* TODO: user shouldn't be able to change this once submitted */}
@@ -91,7 +112,6 @@ class LoadPanel extends React.Component {
                             required
                             type="text"
                             placeholder="Enter a task session name"
-                            defaultValue={this.state.form.experimentName}
                         />
                     </Form.Group>
                     <Form.Group controlId="hitTitle">
@@ -100,7 +120,6 @@ class LoadPanel extends React.Component {
                             required
                             type="text"
                             placeholder="Enter HIT Title (max 128 characters)"
-                            defaultValue={this.state.form.hitTitle}
                         />
                     </Form.Group>
                     <Form.Group controlId="hitDescription">
@@ -109,7 +128,6 @@ class LoadPanel extends React.Component {
                             required
                             type="text"
                             placeholder="Enter HIT Description (max 2000 characters)"
-                            defaultValue={this.state.form.hitDescription}
                         />
                     </Form.Group>
                     <Form.Group controlId="hitKeywords">
@@ -118,13 +136,12 @@ class LoadPanel extends React.Component {
                             required
                             type="text"
                             placeholder="Enter HIT Keywords (comma separated)"
-                            defaultValue={this.state.form.hitKeywords}
                         />
                     </Form.Group>
                     <Form.Row>
                         <Form.Group as={Col} md="6" controlId="workerCountry">
                             <Form.Label>Worker Country</Form.Label>
-                            <Form.Control as="select" defaultValue={this.state.form.workerCountry}>
+                            <Form.Control as="select">
                                 <option>All</option>
                                 <option>US</option>
                             </Form.Control>
@@ -135,7 +152,6 @@ class LoadPanel extends React.Component {
                                 required
                                 type="text"
                                 placeholder=""
-                                defaultValue={this.state.form.minApproved}
                             />
                         </Form.Group>
                     </Form.Row>
