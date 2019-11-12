@@ -48,5 +48,29 @@ export const ExperimentPaneActions = {
             type: experimentPaneTypes.SET_RETAINER_MODE_FAILURE,
             error
         })
+    },
+    setCurrExperiment: experiment => {
+        return ({
+            type: experimentPaneTypes.SET_CURR_EXPERIMENT,
+            experiment
+        })
+    },
+    setCurrExperimentFailure: error => {
+        return ({
+            type: experimentPaneTypes.SET_CURR_EXPERIMENT_FAILURE,
+            error
+        })
+    },
+    addExperimentName: name => {
+        return ({
+            type: experimentPaneTypes.ADD_EXPERIMENT_NAME,
+            name
+        })
+    },
+    addExperimentNameFailure: error => {
+        return ({
+            type: experimentPaneTypes.ADD_EXPERIMENT_NAME_FAILURE,
+            error
+        })
     }
 }

@@ -77,11 +77,51 @@ function setRetainerMode(state = {}, action) {
     }
 }
 
+function setCurrExperiment(state = {}, action) {
+    switch(action.type) {
+        case experimentPaneTypes.SET_CURR_EXPERIMENT:
+            return {
+                ...state,
+                error: null,
+                experiment: action.experiment
+            }
+        case experimentPaneTypes.SET_CURR_EXPERIMENT_FAILURE:
+            return {
+                ...state,
+                error: action.error,
+                experiment: null
+            }
+        default:
+            return state
+    }
+}
+
+function addExperimentName(state = {}, action) {
+    switch (action.type) {
+        case experimentPaneTypes.ADD_EXPERIMENT_NAME:
+            return {
+                ...state,
+                error: action.error,
+                names: state.names ? [...state.names, action.name] : [action.name]
+            }
+        case experimentPaneTypes.ADD_EXPERIMENT_NAME_FAILURE:
+            return {
+                ...state,
+                error: action.error,
+                names: null
+            }
+        default:
+            return state
+    }
+}
+
 const experimentPaneReducers = combineReducers({
     enableLivePane,
     setHitMode,
     setSandboxMode,
-    setRetainerMode
+    setRetainerMode,
+    setCurrExperiment,
+    addExperimentName
 })
 
 export default experimentPaneReducers;
