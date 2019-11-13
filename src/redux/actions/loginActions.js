@@ -22,12 +22,18 @@ export const LoginActions = {
     postLoginTokens: tokens => {
         return (dispatch) => {
             dispatch(LoginActions.setLoginTokens(tokens));
-            return fetch( "/Retainer/php/login.php", {
+			console.log(`this is public URL: ${process.env.PUBLIC_URL}`);
+            return fetch(process.env.PUBLIC_URL + "/old/Retainer/php/login.php", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+						   "Content-Type": "application/json",
+				           "Accept": "text/plain"
+				         },
                 body: JSON.stringify(tokens)
             }).then((res) => {
                 if (!res.ok) throw Error(res.statusText);
+				console.log("login good");
+				console.log(res);
             }).then(() => {
                 dispatch(LoginActions.getSessionList(tokens));
             }).catch((err) => {
@@ -37,7 +43,7 @@ export const LoginActions = {
     },
     getSessionList: tokens => {
         return (dispatch) => {
-            return fetch("/Retainer/php/getSessionsList.php", {
+            return fetch(process.env.PUBLIC_URL + "/old/Retainer/php/getSessionsList.php", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(tokens)
