@@ -4,6 +4,9 @@ import { ExperimentPaneActions } from '../../redux/actions/experimentPaneActions
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col'
+import Modal from 'react-bootstrap/Modal';
+import ModalBody from 'react-bootstrap/ModalBody';
+import ModalFooter from 'react-bootstrap/ModalFooter';
 
 class LoadPanel extends React.Component {
     constructor(props) {
@@ -19,18 +22,21 @@ class LoadPanel extends React.Component {
                 workerCountry: "All",
                 minApproved: ""
             },
-            dropdownValue: "Select an experiment name"
+            dropdownValue: "Select an experiment name",
+            showNameModal: false
         };
 
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleTextInputChange = this.handleTextInputChange.bind(this);
         this.handleDropdownChange = this.handleDropdownChange.bind(this);
+        this.handleCopyClick = this.handleCopyClick.bind(this);
     }
 
     handleDropdownChange(event) {
         this.setState({dropdownValue: event.target.value}, () => {
             if (this.state.dropdownValue !== "Select an experiment name") {
                 // TODO: thunk that uses experimentName=this.state.dropdownValue in order to grab info about the currExperiment
+                // within that thunk, dispatch a SET_CURR_EXPERIMENT action
                 this.props.setCurrExperiment({
                     experimentName: this.state.dropdownValue,
                     hitTitle: "",
@@ -75,6 +81,18 @@ class LoadPanel extends React.Component {
         });
     }
 
+    handleCopyClick(event) {
+        // this will just enable modal, ok click handler will do actual logic, cnacle will just do nothing
+        // TODO: prompt user with dialog to enter a new, unique experimentName
+        this.setState({showNameModal: true});
+        
+        // setCurrExperiment with all the same values except experimentName
+
+        // update experimentNames with new experimentName
+
+        // update dropdownValue with new experimentName
+    }
+
     handleTextInputChange(event) {
         let field = {};
         field[event.target.id] = event.target.value;
@@ -116,11 +134,36 @@ class LoadPanel extends React.Component {
     render() {
         return (
             <div className="mt-3">
+                <Modal show={this.state.showNameModal}>
+                    <ModalBody>
+                        <Form.Group controlId="experimentNameModal">
+                            <Form.Label>Please enter a unique new task name</Form.Label>
+                            <Form.Control
+                                required
+                                type="text"
+                                placeholder="Task session name"
+                                // value={this.state.textForm.experimentName}
+                                // onChange={this.handleTextInputChange}
+                            />
+                        </Form.Group>
+                    </ModalBody>
+                    <ModalFooter>
+                        {/* TODO: fix padding */}
+                        <Button variant="primary">OK</Button>
+                        <Button variant="secondary">Cancel</Button>
+                    </ModalFooter>
+                </Modal>
+
                 <h3>Load an old experiment</h3>
 
                 <div className="my-3">
-                    <Button variant="info" className="mx-1">Copy</Button>
-                    <Button variant="danger" className="mx-1">Delete</Button>
+                    <Button variant="info" className="mx-1" 
+                        disabled={!this.props.currExperiment || !this.props.currExperiment.experimentName}
+                        onClick={this.handleCopyClick}>Copy
+                    </Button>
+                    <Button variant="danger" className="mx-1"
+                        disabled={!this.props.currExperiment || !this.props.currExperiment.experimentName}>Delete
+                    </Button>
                     <Form.Group controlId="loadOldExperiment" className="my-2">
                         <Form.Control as="select" value={this.state.dropdownValue} onChange={this.handleDropdownChange}>
                             <option>Select an experiment name</option>
