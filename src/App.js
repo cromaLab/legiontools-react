@@ -14,7 +14,7 @@ function App() {
   return (
     <div className="App">
       <Navbar bg="light" className="justify-content-between">
-        <Navbar.Brand href="#home">
+        <Navbar.Brand href="/">
           LEGIONTOOLS
         </Navbar.Brand>
         <Navbar.Collapse className="justify-content-end">
@@ -22,7 +22,7 @@ function App() {
             <Nav.Link href="https://docs.google.com/document/d/e/2PACX-1vSGBJBshLXXbMzG1FMYy5L0fEdT0mwHwLh5o6qZcpSdk3y-Xk9ZIaPBwE5O2NSdCsbQrtrh7-QLzP4z/pub?embedded=true">User Guide</Nav.Link>
             <a href="http://croma.eecs.umich.edu/croma.html" target="_blank" rel="noopener noreferrer">
               <img
-                  src="/CROMA_logo.png"
+                  src={process.env.PUBLIC_URL + "/CROMA_logo.png"}
                   height="30"
                   className="d-inline-block align-top"
                   alt="CROMA Lab Logo"

@@ -68,7 +68,8 @@ class LivePane extends React.Component {
 }
 
 const mapStateToProps = state => ({
-    retainerMode: (state.experimentPaneReducers.setRetainerMode.enabled)
+    retainerMode: (state.experimentPaneReducers.setRetainerMode.enabled),
+    sandboxMode: (state.experimentPaneReducers.setSandboxMode.enabled)
 })
 
 export default connect(mapStateToProps, null)(LivePane);

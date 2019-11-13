@@ -21,7 +21,7 @@ class LoginModal extends React.Component {
         console.log(this.refs.loginAccessKey.value);
         console.log(this.refs.loginSecretKey.value);
 
-        this.props.setLoginTokens({
+        this.props.postLoginTokens({
             accessKey: this.refs.loginAccessKey.value,
             secretKey: this.refs.loginSecretKey.value
         })
@@ -71,7 +71,8 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-    setLoginTokens: tokens => dispatch(LoginActions.setLoginTokens(tokens))
+    setLoginTokens: tokens => dispatch(LoginActions.setLoginTokens(tokens)),
+    postLoginTokens: tokens => dispatch(LoginActions.postLoginTokens(tokens))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoginModal);
