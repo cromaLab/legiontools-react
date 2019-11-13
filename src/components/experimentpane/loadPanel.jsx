@@ -29,7 +29,6 @@ class LoadPanel extends React.Component {
 
     handleDropdownChange(event) {
         this.setState({dropdownValue: event.target.value}, () => {
-            // ignore default value
             if (this.state.dropdownValue !== "Select an experiment name") {
                 // TODO: thunk that uses experimentName=this.state.dropdownValue in order to grab info about the currExperiment
                 this.props.setCurrExperiment({
@@ -40,6 +39,38 @@ class LoadPanel extends React.Component {
                     workerCountry: "",
                     minApproved: ""
                 });
+
+                // TODO: use currExperiment data to fill this.state.textForm
+
+                if (!this.props.livePaneEnabled) {
+                    this.props.enableLivePane(true);
+                }
+            }
+            else {
+                // if the user deselects existing experiment, clear out the currExperiment and enable user to make new experiment
+                this.props.setCurrExperiment({
+                    experimentName: "",
+                    hitTitle: "",
+                    hitDescription: "",
+                    hitKeywords: "",
+                    workerCountry: "",
+                    minApproved: ""
+                });
+
+                // reset the values of the form
+                this.setState({
+                    textForm: {
+                        experimentName: "",
+                        hitTitle: "",
+                        hitDescription: "",
+                        hitKeywords: "",
+                        workerCountry: "All",
+                        minApproved: ""
+                    }
+                });
+
+                // disable the live pane
+                this.props.enableLivePane(false);
             }
         });
     }
@@ -49,16 +80,14 @@ class LoadPanel extends React.Component {
         field[event.target.id] = event.target.value;
 
         // works because this.state.textForm's keys match the form's controlIds
-        this.setState({textForm: {...this.state.textForm, ...field}}, () => {
-            console.log(this.state.textForm);
-        });
+        this.setState({textForm: {...this.state.textForm, ...field}});
     }
 
     handleSubmit(event) {
         event.preventDefault();
 
         // if no currExperiment is currently set, then add the new experiment to experimentNames
-        if (!this.props.currExperiment) {
+        if (!this.props.currExperiment || !this.props.currExperiment.experimentName) {
             this.props.addExperimentName(this.state.textForm.experimentName);
         }
 
@@ -79,7 +108,9 @@ class LoadPanel extends React.Component {
             this.props.enableLivePane(true);
         }
 
-        // TODO: change the dropdown menu's value accordingly
+        // TODO: thunk changes the dropdown menu's value accordingly 
+        // (can't here because this.props.currExperiment isn't set yet)
+        this.setState({dropdownValue: this.state.textForm.experimentName});
     }
 
     render() {
@@ -93,18 +124,17 @@ class LoadPanel extends React.Component {
                     <Form.Group controlId="loadOldExperiment" className="my-2">
                         <Form.Control as="select" value={this.state.dropdownValue} onChange={this.handleDropdownChange}>
                             <option>Select an experiment name</option>
-                            <option>1</option>
-                            <option>2</option>
-                            <option>3</option>
-                            <option>4</option>
+                            {this.props.experimentNames && 
+                             this.props.experimentNames.map(name => (<option key={name}>{name}</option>))}
                         </Form.Control>
                     </Form.Group>
                 </div>
 
                 <h3>Or create a new experiment</h3>
 
+                {/* TODO: updating this.state.form values doesn't work */}
                 {/* TODO: add validation (minApproved should be number, etc) */}
-                <Form onSubmit={this.handleSubmit} value={this.state.textForm} onChange={this.handleTextInputChange}>
+                <Form onSubmit={this.handleSubmit}>
                     <Form.Group controlId="experimentName">
                         <Form.Label>Experiment Name (Remember This)</Form.Label>
                         {/* TODO: user shouldn't be able to change this once submitted */}
@@ -112,6 +142,8 @@ class LoadPanel extends React.Component {
                             required
                             type="text"
                             placeholder="Enter a task session name"
+                            value={this.state.textForm.experimentName}
+                            onChange={this.handleTextInputChange}
                         />
                     </Form.Group>
                     <Form.Group controlId="hitTitle">
@@ -120,6 +152,8 @@ class LoadPanel extends React.Component {
                             required
                             type="text"
                             placeholder="Enter HIT Title (max 128 characters)"
+                            value={this.state.textForm.hitTitle}
+                            onChange={this.handleTextInputChange}
                         />
                     </Form.Group>
                     <Form.Group controlId="hitDescription">
@@ -128,6 +162,8 @@ class LoadPanel extends React.Component {
                             required
                             type="text"
                             placeholder="Enter HIT Description (max 2000 characters)"
+                            value={this.state.textForm.hitDescription}
+                            onChange={this.handleTextInputChange}
                         />
                     </Form.Group>
                     <Form.Group controlId="hitKeywords">
@@ -136,12 +172,16 @@ class LoadPanel extends React.Component {
                             required
                             type="text"
                             placeholder="Enter HIT Keywords (comma separated)"
+                            value={this.state.textForm.hitKeywords}
+                            onChange={this.handleTextInputChange}
                         />
                     </Form.Group>
                     <Form.Row>
                         <Form.Group as={Col} md="6" controlId="workerCountry">
                             <Form.Label>Worker Country</Form.Label>
-                            <Form.Control as="select">
+                            <Form.Control as="select"
+                                value={this.state.textForm.workerCountry}
+                                onChange={this.handleTextInputChange}>
                                 <option>All</option>
                                 <option>US</option>
                             </Form.Control>
@@ -152,10 +192,14 @@ class LoadPanel extends React.Component {
                                 required
                                 type="text"
                                 placeholder=""
+                                value={this.state.textForm.minApproved}
+                                onChange={this.handleTextInputChange}
                             />
                         </Form.Group>
                     </Form.Row>
-                    <Button variant="primary" type="submit">{this.props.currExperiment ? 'Update' : 'Create'}</Button>
+                    <Button variant="primary" type="submit">
+                        {this.props.currExperiment && this.props.currExperiment.experimentName ? 'Update' : 'Create'}
+                    </Button>
                 </Form>
                 
             </div>
