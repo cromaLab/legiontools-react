@@ -24,8 +24,11 @@ class LoadPanel extends React.Component {
                 minApproved: ""
             },
             dropdownValue: "Select an experiment name",
-            showCopyModal: false,
-            modalValue: ""
+            copyModal: {
+                show: false,
+                value: ""
+            },
+            showDeleteModal: false
         };
 
         // handles text input form
@@ -38,8 +41,13 @@ class LoadPanel extends React.Component {
         // handles Copy functionality
         this.openCopyModal = this.openCopyModal.bind(this);
         this.closeCopyModal = this.closeCopyModal.bind(this);
-        this.handleModalChange = this.handleModalChange.bind(this);
+        this.handleCopyModalChange = this.handleCopyModalChange.bind(this);
         this.copyExperiment = this.copyExperiment.bind(this);
+
+        // handles Delete functionality
+        this.openDeleteModal = this.openDeleteModal.bind(this);
+        this.closeDeleteModal = this.closeDeleteModal.bind(this);
+        this.deleteExperiment = this.deleteExperiment.bind(this);
     }
 
     handleDropdownChange(event) {
@@ -93,25 +101,37 @@ class LoadPanel extends React.Component {
 
     openCopyModal() {
         // modal asks user to give the copied experiment a unique name
-        this.setState({showCopyModal: true});
+        this.setState({
+            copyModal: {
+                ...this.state.copyModal,
+                show: true
+            }
+        });
     }
 
     closeCopyModal() {
         // reset modal
         this.setState({
-            showCopyModal: false,
-            modalValue: ""
+            copyModal: {
+                show: false,
+                value: ""
+            }
         });
     }
 
-    handleModalChange(event) {
-        this.setState({modalValue: event.target.value});
+    handleCopyModalChange(event) {
+        this.setState({
+            copyModal: {
+                ...this.state.copyModal,
+                value: event.target.value
+            }
+        });
     }
 
     copyExperiment() {
         // setCurrExperiment with copied values except for the unique experimentName
         this.props.setCurrExperiment({
-            experimentName: this.state.modalValue,
+            experimentName: this.state.copyModal.value,
             hitTitle: this.props.currExperiment.hitTitle,
             hitDescription: this.props.currExperiment.hitDescription,
             hitKeywords: this.props.currExperiment.hitKeywords,
@@ -120,20 +140,63 @@ class LoadPanel extends React.Component {
         });
 
         // update experimentNames with new experimentName
-        this.props.addExperimentName(this.state.modalValue);
+        this.props.addExperimentName(this.state.copyModal.value);
 
         // update dropdownValue with new experimentName
-        this.setState({dropdownValue: this.state.modalValue});
+        this.setState({dropdownValue: this.state.copyModal.value});
 
         // update text form with new experimentName
         this.setState({
             textForm: {
                 ...this.props.currExperiment,
-                experimentName: this.state.modalValue
+                experimentName: this.state.copyModal.value
             }
         });
 
         this.closeCopyModal();
+    }
+
+    openDeleteModal() {
+        this.setState({showDeleteModal: true});
+    }
+
+    closeDeleteModal() {
+        this.setState({showDeleteModal: false});
+    }
+
+    deleteExperiment() {
+        // TODO: remove currExperiment.experimentName from experimentNames (create an action to do this)
+        // TODO: create helper functions to do common actions
+
+        // clear the currExperiment
+        this.props.setCurrExperiment({
+            experimentName: "",
+            hitTitle: "",
+            hitDescription: "",
+            hitKeywords: "",
+            workerCountry: "",
+            minApproved: ""
+        });
+
+        // reset dropdownValue
+        this.setState({dropdownValue: "Select an experiment name"});
+
+        // reset the values of the form
+        this.setState({
+            textForm: {
+                experimentName: "",
+                hitTitle: "",
+                hitDescription: "",
+                hitKeywords: "",
+                workerCountry: "All",
+                minApproved: ""
+            }
+        });
+
+        // disable the live pane
+        this.props.enableLivePane(false);
+
+        this.closeDeleteModal();
     }
 
     handleTextInputChange(event) {
@@ -177,7 +240,7 @@ class LoadPanel extends React.Component {
     render() {
         return (
             <div className="mt-3">
-                <Modal show={this.state.showCopyModal}>
+                <Modal show={this.state.copyModal.show}>
                     <ModalHeader closeButton>Please enter a unique new task name</ModalHeader>
                     <ModalBody>
                         <Form onSubmit={this.copyExperiment}>
@@ -186,13 +249,23 @@ class LoadPanel extends React.Component {
                                 type="text"
                                 placeholder="Task session name"
                                 value={this.modalValue}
-                                onChange={this.handleModalChange}
+                                onChange={this.handleCopyModalChange}
                             />
                         </Form>
                     </ModalBody>
                     <ModalFooter className="p-0">
                         <Button variant="primary" onClick={this.copyExperiment}>OK</Button>
                         <Button variant="secondary" onClick={this.closeCopyModal}>Cancel</Button>
+                    </ModalFooter>
+                </Modal>
+
+                <Modal show={this.state.showDeleteModal}>
+                    <ModalBody>
+                        <p>Are you sure you want to delete the experiment {this.props.currExperiment && this.props.currExperiment.experimentName ? `"${this.props.currExperiment.experimentName}"`: ""}? This will stop recruiting and prevent you from approving/rejecting submitted HITs.</p>
+                    </ModalBody>
+                    <ModalFooter className="p-0">
+                        <Button variant="primary" onClick={this.deleteExperiment}>OK</Button>
+                        <Button variant="secondary" onClick={this.closeDeleteModal}>Cancel</Button>
                     </ModalFooter>
                 </Modal>
 
@@ -204,7 +277,8 @@ class LoadPanel extends React.Component {
                         onClick={this.openCopyModal}>Copy
                     </Button>
                     <Button variant="danger" className="mx-1"
-                        disabled={!this.props.currExperiment || !this.props.currExperiment.experimentName}>Delete
+                        disabled={!this.props.currExperiment || !this.props.currExperiment.experimentName}
+                        onClick={this.openDeleteModal}>Delete
                     </Button>
                     <Form.Group controlId="loadOldExperiment" className="my-2">
                         <Form.Control as="select" value={this.state.dropdownValue} onChange={this.handleDropdownChange}>
