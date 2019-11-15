@@ -7,6 +7,7 @@ import Col from 'react-bootstrap/Col'
 import Modal from 'react-bootstrap/Modal';
 import ModalBody from 'react-bootstrap/ModalBody';
 import ModalHeader from 'react-bootstrap/ModalHeader';
+import ModalFooter from 'react-bootstrap/ModalFooter';
 
 class LoadPanel extends React.Component {
     constructor(props) {
@@ -23,7 +24,8 @@ class LoadPanel extends React.Component {
                 minApproved: ""
             },
             dropdownValue: "Select an experiment name",
-            showCopyModal: false
+            showCopyModal: false,
+            modalValue: ""
         };
 
         // handles text input form
@@ -35,8 +37,9 @@ class LoadPanel extends React.Component {
         
         // handles Copy functionality
         this.openCopyModal = this.openCopyModal.bind(this);
-        this.copyExperiment = this.copyExperiment.bind(this);
         this.closeCopyModal = this.closeCopyModal.bind(this);
+        this.handleModalChange = this.handleModalChange.bind(this);
+        this.copyExperiment = this.copyExperiment.bind(this);
     }
 
     handleDropdownChange(event) {
@@ -88,25 +91,27 @@ class LoadPanel extends React.Component {
         });
     }
 
-    openCopyModal(event) {
+    openCopyModal() {
         // modal asks user to give the copied experiment a unique name
         this.setState({showCopyModal: true});
     }
 
-    closeCopyModal(event) {
-        this.setState({showCopyModal: false});
+    closeCopyModal() {
+        // reset modal
+        this.setState({
+            showCopyModal: false,
+            modalValue: ""
+        });
     }
 
-    copyExperiment(event) {
-        event.preventDefault();
+    handleModalChange(event) {
+        this.setState({modalValue: event.target.value});
+    }
 
-        // TODO: replace with closeCopyModal()
-        this.setState({showCopyModal: false});
-
+    copyExperiment() {
         // setCurrExperiment with copied values except for the unique experimentName
-        // TODO: event.target.value is null
         this.props.setCurrExperiment({
-            experimentName: event.target.value,
+            experimentName: this.state.modalValue,
             hitTitle: this.props.currExperiment.hitTitle,
             hitDescription: this.props.currExperiment.hitDescription,
             hitKeywords: this.props.currExperiment.hitKeywords,
@@ -115,18 +120,20 @@ class LoadPanel extends React.Component {
         });
 
         // update experimentNames with new experimentName
-        this.props.addExperimentName(event.target.value);
+        this.props.addExperimentName(this.state.modalValue);
 
         // update dropdownValue with new experimentName
-        this.setState({dropdownValue: event.target.value});
+        this.setState({dropdownValue: this.state.modalValue});
 
-        // TODO: update text form with new values (doesn't work because https://reactjs.org/docs/forms.html#controlled-components)
-        // this.setState({
-        //     textForm: {
-        //         ...this.props.currExperiment,
-        //         experimentName: event.target.value
-        //     }
-        // });
+        // update text form with new experimentName
+        this.setState({
+            textForm: {
+                ...this.props.currExperiment,
+                experimentName: this.state.modalValue
+            }
+        });
+
+        this.closeCopyModal();
     }
 
     handleTextInputChange(event) {
@@ -170,19 +177,23 @@ class LoadPanel extends React.Component {
     render() {
         return (
             <div className="mt-3">
-                <Modal show={this.state.showCopyModal} onHide={this.closeCopyModal}>
-                    <ModalHeader closeButton></ModalHeader>
+                <Modal show={this.state.showCopyModal}>
+                    <ModalHeader closeButton>Please enter a unique new task name</ModalHeader>
                     <ModalBody>
                         <Form onSubmit={this.copyExperiment}>
-                            <Form.Label>Please enter a unique new task name</Form.Label>
                             <Form.Control
                                 required
                                 type="text"
                                 placeholder="Task session name"
+                                value={this.modalValue}
+                                onChange={this.handleModalChange}
                             />
-                            <Button variant="primary" type="submit">OK</Button>
                         </Form>
                     </ModalBody>
+                    <ModalFooter className="p-0">
+                        <Button variant="primary" onClick={this.copyExperiment}>OK</Button>
+                        <Button variant="secondary" onClick={this.closeCopyModal}>Cancel</Button>
+                    </ModalFooter>
                 </Modal>
 
                 <h3>Load an old experiment</h3>
@@ -206,7 +217,6 @@ class LoadPanel extends React.Component {
 
                 <h3>Or create a new experiment</h3>
 
-                {/* TODO: updating this.state.form values doesn't work */}
                 {/* TODO: add validation (minApproved should be number, etc) */}
                 <Form onSubmit={this.handleSubmit}>
                     <Form.Group controlId="experimentName">
