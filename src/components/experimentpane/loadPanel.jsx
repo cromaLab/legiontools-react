@@ -72,14 +72,7 @@ class LoadPanel extends React.Component {
             }
             else {
                 // if the user deselects existing experiment, clear out the currExperiment and enable user to make new experiment
-                this.props.setCurrExperiment({
-                    experimentName: "",
-                    hitTitle: "",
-                    hitDescription: "",
-                    hitKeywords: "",
-                    workerCountry: "",
-                    minApproved: ""
-                });
+                this.props.setCurrExperiment(null);
 
                 // reset the values of the form
                 this.setState({
@@ -165,18 +158,12 @@ class LoadPanel extends React.Component {
     }
 
     deleteExperiment() {
-        // TODO: remove currExperiment.experimentName from experimentNames (create an action to do this)
-        // TODO: create helper functions to do common actions
+        // remove from experimentNames
+        this.props.removeExperimentName(this.props.currExperiment.experimentName);
 
+        // TODO: create helper functions to do common actions
         // clear the currExperiment
-        this.props.setCurrExperiment({
-            experimentName: "",
-            hitTitle: "",
-            hitDescription: "",
-            hitKeywords: "",
-            workerCountry: "",
-            minApproved: ""
-        });
+        this.props.setCurrExperiment(null);
 
         // reset dropdownValue
         this.setState({dropdownValue: "Select an experiment name"});
@@ -211,7 +198,7 @@ class LoadPanel extends React.Component {
         event.preventDefault();
 
         // if no currExperiment is currently set, then add the new experiment to experimentNames
-        if (!this.props.currExperiment || !this.props.currExperiment.experimentName) {
+        if (!this.props.currExperiment) {
             this.props.addExperimentName(this.state.textForm.experimentName);
         }
 
@@ -261,7 +248,7 @@ class LoadPanel extends React.Component {
 
                 <Modal show={this.state.showDeleteModal}>
                     <ModalBody>
-                        <p>Are you sure you want to delete the experiment {this.props.currExperiment && this.props.currExperiment.experimentName ? `"${this.props.currExperiment.experimentName}"`: ""}? This will stop recruiting and prevent you from approving/rejecting submitted HITs.</p>
+                        <p>Are you sure you want to delete the experiment {this.props.currExperiment ? `"${this.props.currExperiment.experimentName}"`: ""}? This will stop recruiting and prevent you from approving/rejecting submitted HITs.</p>
                     </ModalBody>
                     <ModalFooter className="p-0">
                         <Button variant="primary" onClick={this.deleteExperiment}>OK</Button>
@@ -273,11 +260,11 @@ class LoadPanel extends React.Component {
 
                 <div className="my-3">
                     <Button variant="info" className="mx-1" 
-                        disabled={!this.props.currExperiment || !this.props.currExperiment.experimentName}
+                        disabled={!this.props.currExperiment}
                         onClick={this.openCopyModal}>Copy
                     </Button>
                     <Button variant="danger" className="mx-1"
-                        disabled={!this.props.currExperiment || !this.props.currExperiment.experimentName}
+                        disabled={!this.props.currExperiment}
                         onClick={this.openDeleteModal}>Delete
                     </Button>
                     <Form.Group controlId="loadOldExperiment" className="my-2">
@@ -356,7 +343,7 @@ class LoadPanel extends React.Component {
                         </Form.Group>
                     </Form.Row>
                     <Button variant="primary" type="submit">
-                        {this.props.currExperiment && this.props.currExperiment.experimentName ? 'Update' : 'Create'}
+                        {this.props.currExperiment ? 'Update' : 'Create'}
                     </Button>
                 </Form>
                 
@@ -370,13 +357,14 @@ const mapStateToProps = state => ({
     tokens: (state.loginReducers.setLoginTokens.tokens),
     livePaneEnabled: (state.experimentPaneReducers.enableLivePane.enabled),
     currExperiment: (state.experimentPaneReducers.setCurrExperiment.experiment),
-    experimentNames: (state.experimentPaneReducers.addExperimentName.names)
+    experimentNames: (state.experimentPaneReducers.setExperimentNames.names)
 })
 
 const mapDispatchToProps = dispatch => ({
     enableLivePane: enabled => dispatch(ExperimentPaneActions.enableLivePane(enabled)),
     setCurrExperiment: experiment => dispatch(ExperimentPaneActions.setCurrExperiment(experiment)),
-    addExperimentName: name => dispatch(ExperimentPaneActions.addExperimentName(name))
+    addExperimentName: name => dispatch(ExperimentPaneActions.addExperimentName(name)),
+    removeExperimentName: name => dispatch(ExperimentPaneActions.removeExperimentName(name))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoadPanel);

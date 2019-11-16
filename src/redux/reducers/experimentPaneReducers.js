@@ -96,7 +96,7 @@ function setCurrExperiment(state = {}, action) {
     }
 }
 
-function addExperimentName(state = {}, action) {
+function setExperimentNames(state = {}, action) {
     switch (action.type) {
         case experimentPaneTypes.ADD_EXPERIMENT_NAME:
             return {
@@ -104,15 +104,31 @@ function addExperimentName(state = {}, action) {
                 error: action.error,
                 names: state.names ? [...state.names, action.name] : [action.name]
             }
-        case experimentPaneTypes.ADD_EXPERIMENT_NAME_FAILURE:
+        case experimentPaneTypes.REMOVE_EXPERIMENT_NAME:
+            // reducer copies over values from state.names except for action.name
             return {
                 ...state,
-                error: action.error,
-                names: null
+                error: null,
+                names: state.names.reduce((accumulator, currValue) => {
+                    if (currValue !== action.name) {
+                        accumulator.push(currValue);
+                    }
+
+                    return accumulator;
+                }, [])
+            }
+        // TODO: is this kosher?
+        case experimentPaneTypes.ADD_EXPERIMENT_NAME_FAILURE:
+        case experimentPaneTypes.REMOVE_EXPERIMENT_NAME_FAILURE:
+            // leave state.names as is
+            return {
+                ...state,
+                error: action.error
             }
         default:
             return state
     }
+
 }
 
 const experimentPaneReducers = combineReducers({
@@ -121,7 +137,7 @@ const experimentPaneReducers = combineReducers({
     setSandboxMode,
     setRetainerMode,
     setCurrExperiment,
-    addExperimentName
+    setExperimentNames
 })
 
 export default experimentPaneReducers;

@@ -72,5 +72,17 @@ export const ExperimentPaneActions = {
             type: experimentPaneTypes.ADD_EXPERIMENT_NAME_FAILURE,
             error
         })
+    },
+    removeExperimentName: name => {
+        return ({
+            type: experimentPaneTypes.REMOVE_EXPERIMENT_NAME,
+            name
+        })
+    },
+    removeExperimentNameFailure: error => {
+        return ({
+            type: experimentPaneTypes.REMOVE_EXPERIMENT_NAME_FAILURE,
+            error
+        })
     }
 }
