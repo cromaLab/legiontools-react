@@ -31,6 +31,9 @@ class LoadPanel extends React.Component {
             showDeleteModal: false
         };
 
+        // helper func to reduce duplication
+        this.resetState = this.resetState.bind(this);
+
         // handles text input form
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleTextInputChange = this.handleTextInputChange.bind(this);
@@ -38,58 +41,65 @@ class LoadPanel extends React.Component {
         // handles dropdown form
         this.handleDropdownChange = this.handleDropdownChange.bind(this);
         
-        // handles Copy functionality
+        // handles copy functionality
         this.openCopyModal = this.openCopyModal.bind(this);
         this.closeCopyModal = this.closeCopyModal.bind(this);
         this.handleCopyModalChange = this.handleCopyModalChange.bind(this);
         this.copyExperiment = this.copyExperiment.bind(this);
 
-        // handles Delete functionality
+        // handles delete functionality
         this.openDeleteModal = this.openDeleteModal.bind(this);
         this.closeDeleteModal = this.closeDeleteModal.bind(this);
         this.deleteExperiment = this.deleteExperiment.bind(this);
     }
 
-    handleDropdownChange(event) {
-        this.setState({dropdownValue: event.target.value}, () => {
-            if (this.state.dropdownValue !== "Select an experiment name") {
-                // TODO: thunk that uses experimentName=this.state.dropdownValue in order to grab info about the currExperiment
-                // within that thunk, dispatch a SET_CURR_EXPERIMENT action
-                this.props.setCurrExperiment({
-                    experimentName: this.state.dropdownValue,
-                    hitTitle: "",
-                    hitDescription: "",
-                    hitKeywords: "",
-                    workerCountry: "",
-                    minApproved: ""
-                });
+    resetState() {
+        // clear out the currExperiment, allowing users to create a new one
+        this.props.setCurrExperiment(null);
 
-                // TODO: use currExperiment data to fill this.state.textForm
+        // deselect currExperiment in the dropdown menu
+        this.setState({dropdownValue: "Select an experiment name"});
 
-                if (!this.props.livePaneEnabled) {
-                    this.props.enableLivePane(true);
-                }
-            }
-            else {
-                // if the user deselects existing experiment, clear out the currExperiment and enable user to make new experiment
-                this.props.setCurrExperiment(null);
-
-                // reset the values of the form
-                this.setState({
-                    textForm: {
-                        experimentName: "",
-                        hitTitle: "",
-                        hitDescription: "",
-                        hitKeywords: "",
-                        workerCountry: "All",
-                        minApproved: ""
-                    }
-                });
-
-                // disable the live pane
-                this.props.enableLivePane(false);
+        // empty text form
+        this.setState({
+            textForm: {
+                experimentName: "",
+                hitTitle: "",
+                hitDescription: "",
+                hitKeywords: "",
+                workerCountry: "All",
+                minApproved: ""
             }
         });
+
+        // disable the live pane
+        this.props.enableLivePane(false);
+    }
+
+    handleDropdownChange(event) {
+        if (event.target.value === "Select an experiment name") {
+            this.resetState();
+        }
+        else {
+            this.setState({dropdownValue: event.target.value});
+
+            // TODO: thunk that uses experimentName=this.state.dropdownValue in order to grab info about the currExperiment
+            // within that thunk, dispatch a SET_CURR_EXPERIMENT action
+            this.props.setCurrExperiment({
+                experimentName: event.target.value,
+                hitTitle: "",
+                hitDescription: "",
+                hitKeywords: "",
+                workerCountry: "",
+                minApproved: ""
+            });
+
+            // TODO: use currExperiment data to fill this.state.textForm
+
+            if (!this.props.livePaneEnabled) {
+                this.props.enableLivePane(true);
+            }
+        }
     }
 
     openCopyModal() {
@@ -158,30 +168,10 @@ class LoadPanel extends React.Component {
     }
 
     deleteExperiment() {
-        // remove from experimentNames
+        // remove the experiment from experimentNames
         this.props.removeExperimentName(this.props.currExperiment.experimentName);
 
-        // TODO: create helper functions to do common actions
-        // clear the currExperiment
-        this.props.setCurrExperiment(null);
-
-        // reset dropdownValue
-        this.setState({dropdownValue: "Select an experiment name"});
-
-        // reset the values of the form
-        this.setState({
-            textForm: {
-                experimentName: "",
-                hitTitle: "",
-                hitDescription: "",
-                hitKeywords: "",
-                workerCountry: "All",
-                minApproved: ""
-            }
-        });
-
-        // disable the live pane
-        this.props.enableLivePane(false);
+        this.resetState();
 
         this.closeDeleteModal();
     }
@@ -214,7 +204,6 @@ class LoadPanel extends React.Component {
         });
 
         // once experiment is set, enable live pane
-        // TODO: extract this to Redux thunk level?
         if (!this.props.livePaneEnabled) {
             this.props.enableLivePane(true);
         }
@@ -282,13 +271,13 @@ class LoadPanel extends React.Component {
                 <Form onSubmit={this.handleSubmit}>
                     <Form.Group controlId="experimentName">
                         <Form.Label>Experiment Name (Remember This)</Form.Label>
-                        {/* TODO: user shouldn't be able to change this once submitted */}
                         <Form.Control
                             required
                             type="text"
                             placeholder="Enter a task session name"
                             value={this.state.textForm.experimentName}
                             onChange={this.handleTextInputChange}
+                            disabled={this.props.currExperiment}
                         />
                     </Form.Group>
                     <Form.Group controlId="hitTitle">
