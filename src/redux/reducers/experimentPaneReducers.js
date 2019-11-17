@@ -98,17 +98,23 @@ function setCurrExperiment(state = {}, action) {
 
 function setExperimentNames(state = {}, action) {
     switch (action.type) {
+        case experimentPaneTypes.INIT_EXPERIMENT_NAMES:
+            return {
+                ...state,
+                error: null,
+                names: action.names ? action.names : []
+            }
         case experimentPaneTypes.ADD_EXPERIMENT_NAME:
             return {
                 ...state,
                 error: action.error,
-                names: state.names ? [...state.names, action.name] : [action.name]
+                names: [...state.names, action.name]
             }
         case experimentPaneTypes.REMOVE_EXPERIMENT_NAME:
-            // reducer copies over values from state.names except for action.name
             return {
                 ...state,
                 error: null,
+                // reducer copies over values from state.names except for action.name
                 names: state.names.reduce((accumulator, currValue) => {
                     if (currValue !== action.name) {
                         accumulator.push(currValue);
@@ -120,10 +126,17 @@ function setExperimentNames(state = {}, action) {
         // TODO: is this kosher?
         case experimentPaneTypes.ADD_EXPERIMENT_NAME_FAILURE:
         case experimentPaneTypes.REMOVE_EXPERIMENT_NAME_FAILURE:
-            // leave state.names as is
+            // failed to add or remove, leave state.names as is
             return {
                 ...state,
                 error: action.error
+            }
+        case experimentPaneTypes.INIT_EXPERIMENT_NAMES_FAILURE:
+            // failed to initialize, set state.names as empty
+            return {
+                ...state,
+                error: action.error,
+                names: []
             }
         default:
             return state

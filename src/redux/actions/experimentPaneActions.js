@@ -61,6 +61,18 @@ export const ExperimentPaneActions = {
             error
         })
     },
+    initExperimentNames: names => {
+        return ({
+            type: experimentPaneTypes.INIT_EXPERIMENT_NAMES,
+            names
+        })
+    },
+    initExperimentNamesFailure: error => {
+        return ({
+            type: experimentPaneTypes.INIT_EXPERIMENT_NAMES_FAILURE,
+            error
+        })
+    },
     addExperimentName: name => {
         return ({
             type: experimentPaneTypes.ADD_EXPERIMENT_NAME,

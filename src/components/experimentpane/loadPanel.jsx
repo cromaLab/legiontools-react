@@ -132,6 +132,7 @@ class LoadPanel extends React.Component {
     }
 
     copyExperiment() {
+        // TODO: thunk updates DB with new experiment
         // setCurrExperiment with copied values except for the unique experimentName
         this.props.setCurrExperiment({
             experimentName: this.state.copyModal.value,
@@ -168,6 +169,8 @@ class LoadPanel extends React.Component {
     }
 
     deleteExperiment() {
+        // TODO: thunk deletes experiment from DB
+
         // remove the experiment from experimentNames
         this.props.removeExperimentName(this.props.currExperiment.experimentName);
 
@@ -177,11 +180,13 @@ class LoadPanel extends React.Component {
     }
 
     handleTextInputChange(event) {
-        let field = {};
-        field[event.target.id] = event.target.value;
-
         // works because this.state.textForm's keys match the form's controlIds
-        this.setState({textForm: {...this.state.textForm, ...field}});
+        this.setState({
+            textForm: {
+                ...this.state.textForm,
+                [event.target.id]: event.target.value
+            }
+        });
     }
 
     handleSubmit(event) {
