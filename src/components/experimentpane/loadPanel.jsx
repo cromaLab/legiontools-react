@@ -83,7 +83,7 @@ class LoadPanel extends React.Component {
         else {
             this.setState({dropdownValue: event.target.value});
 
-            // TODO: thunk that uses experimentName=this.state.dropdownValue in order to grab info about the currExperiment
+            // TODO: thunk selectFromExperimentNames that uses experimentName=this.state.dropdownValue in order to grab info about the currExperiment
             // within that thunk, dispatch a SET_CURR_EXPERIMENT action
             this.props.setCurrExperiment({
                 experimentName: event.target.value,
@@ -94,7 +94,7 @@ class LoadPanel extends React.Component {
                 minApproved: ""
             });
 
-            // TODO: use currExperiment data to fill this.state.textForm
+            // TODO: after selectFromExperimentNames Promise resolves, use currExperiment data to fill this.state.textForm
 
             if (!this.props.livePaneEnabled) {
                 this.props.enableLivePane(true);
@@ -213,7 +213,6 @@ class LoadPanel extends React.Component {
             this.props.enableLivePane(true);
         }
 
-        // TODO: thunk changes the dropdown menu's value accordingly 
         // (can't here because this.props.currExperiment isn't set yet)
         this.setState({dropdownValue: this.state.textForm.experimentName});
     }

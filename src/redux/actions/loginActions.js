@@ -14,12 +14,6 @@ export const LoginActions = {
             error
         })
     },
-    setSessionList: list => {
-        return ({
-            type: loginTypes.SET_SESSION_LIST,
-            list
-        })
-    },
     postLoginTokens: tokens => {
         return (dispatch) => {
             dispatch(LoginActions.setLoginTokens(tokens));
