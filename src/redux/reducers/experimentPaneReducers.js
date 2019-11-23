@@ -114,14 +114,10 @@ function setExperimentNames(state = {}, action) {
             return {
                 ...state,
                 error: null,
-                // reducer copies over values from state.names except for action.name
-                names: state.names.reduce((accumulator, currValue) => {
-                    if (currValue !== action.name) {
-                        accumulator.push(currValue);
-                    }
-
-                    return accumulator;
-                }, [])
+                // filters out action.name
+                names: state.names.filter((name) => {
+                    return name !== action.name;
+                })
             }
         // TODO: is this kosher?
         case experimentPaneTypes.ADD_EXPERIMENT_NAME_FAILURE:
