@@ -69,45 +69,13 @@ export const ExperimentPaneActions = {
                     if (!res.ok) throw Error(res.statusText);
                     return res.json();
                 }).then((data) => {
-                    /* example from https://cromalab.net/InProgress/LegionToolsUpdatedBeta/getSessionsList.php when accessKey: 1 and secretKey: 1 
-                    {"id":"1", // not needed for anything else, PHP endpoints reference database with experimentName
-                     "0":"1",
-                     "task_title":"Test", // HIT Title
-                     "1":"Test",
-                     "task_description":"Test", // HIT Description
-                     "2":"Test",
-                     "task_keywords":"Test", // HIT keywords
-                     "3":"Test",
-                     "min_price":null, // not set on loadPanel
-                     "4":null,
-                     "max_price":null, // not set on loadPanel
-                     "5":null,
-                     "target_workers":null, // not set on loadPanel
-                     "6":null,
-                     "task":"Testing", // Experiment Name
-                     "7":"Testing",
-                     "done":"1", // I assume it's initialized to 1 when a new experiment is made
-                     "8":"1",
-                     "country":"All", // Worker Country
-                     "9":"All",
-                     "percentApproved":"0", // Min Approved
-                     "10":"0",
-                     "instructions":null, // not set on loadPanel
-                     "11":null,
-                     "noRepeatQualId":null, // not set on loadPanel
-                     "12":null,
-                     "noRepeatQualIdSandbox":null, // not set on loadPanel
-                     "13":null,
-                     "noRepeatQualIdLive":null, // not set on loadPanel
-                     "14":null}
-                     */
                     // TODO: currExperiment should store more than just form-related information
                     console.log(data);
                     dispatch(ExperimentPaneActions.setCurrExperiment({
                         experimentName,
                         hitTitle: data.task_title,
                         hitDescription: data.task_description,
-                        hitKeywords: task_keywords,
+                        hitKeywords: data.task_keywords,
                         workerCountry: data.country,
                         minApproved: data.percentApproved
                     }));

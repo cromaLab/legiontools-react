@@ -85,8 +85,9 @@ class LoadPanel extends React.Component {
 
             // TODO: loadExperiment action
             this.props.loadExperiment(event.target.value, this.props.tokens.accessKey, this.props.tokens.secretKey).then(() => {
+                // TODO: will this execute if loadExperiment throws an error
                 // after currExperiment is set, use currExperiment values to populate textForm
-                this.setState({
+                return this.setState({
                     textForm: {
                         experimentName: this.props.currExperiment.experimentName,
                         hitTitle: this.props.currExperiment.hitTitle,
@@ -96,11 +97,11 @@ class LoadPanel extends React.Component {
                         minApproved: this.props.currExperiment.minApproved
                     }
                 });
+            }).then(() => {
+                if (!this.props.livePaneEnabled) {
+                    this.props.enableLivePane(true);
+                }
             });
-
-            if (!this.props.livePaneEnabled) {
-                this.props.enableLivePane(true);
-            }
         }
     }
 
@@ -193,29 +194,47 @@ class LoadPanel extends React.Component {
     handleSubmit(event) {
         event.preventDefault();
 
-        // if no currExperiment is currently set, then add the new experiment to experimentNames
+        // if no currExperiment is currently set, then create the new experiment
         if (!this.props.currExperiment) {
             // TODO: addExperiment action
             this.props.addExperimentName(this.state.textForm.experimentName);
+
+            this.props.setCurrExperiment({
+                experimentName: this.state.textForm.experimentName,
+                hitTitle: this.state.textForm.hitTitle,
+                hitDescription: this.state.textForm.hitDescription,
+                hitKeywords: this.state.textForm.hitKeywords,
+                workerCountry: this.state.textForm.workerCountry,
+                minApproved: this.state.textForm.minApproved
+            });
+
+                // once experiment is set, enable live pane
+            if (!this.props.livePaneEnabled) {
+                this.props.enableLivePane(true);
+            }
+
+            // (can't here because this.props.currExperiment isn't set yet)
+            this.setState({dropdownValue: this.state.textForm.experimentName});
         }
+        else {
+            // TODO: updateExperiment action
+            this.props.setCurrExperiment({
+                experimentName: this.state.textForm.experimentName,
+                hitTitle: this.state.textForm.hitTitle,
+                hitDescription: this.state.textForm.hitDescription,
+                hitKeywords: this.state.textForm.hitKeywords,
+                workerCountry: this.state.textForm.workerCountry,
+                minApproved: this.state.textForm.minApproved
+            });
 
-        // TODO: else, updateExperiment action
-        this.props.setCurrExperiment({
-            experimentName: this.state.textForm.experimentName,
-            hitTitle: this.state.textForm.hitTitle,
-            hitDescription: this.state.textForm.hitDescription,
-            hitKeywords: this.state.textForm.hitKeywords,
-            workerCountry: this.state.textForm.workerCountry,
-            minApproved: this.state.textForm.minApproved
-        });
+            // once experiment is set, enable live pane
+            if (!this.props.livePaneEnabled) {
+                this.props.enableLivePane(true);
+            }
 
-        // once experiment is set, enable live pane
-        if (!this.props.livePaneEnabled) {
-            this.props.enableLivePane(true);
+            // (can't here because this.props.currExperiment isn't set yet)
+            this.setState({dropdownValue: this.state.textForm.experimentName});
         }
-
-        // (can't here because this.props.currExperiment isn't set yet)
-        this.setState({dropdownValue: this.state.textForm.experimentName});
     }
 
     render() {
@@ -358,8 +377,8 @@ const mapDispatchToProps = dispatch => ({
     enableLivePane: enabled => dispatch(ExperimentPaneActions.enableLivePane(enabled)),
     setCurrExperiment: experiment => dispatch(ExperimentPaneActions.setCurrExperiment(experiment)),
     loadExperiment: (name, accessKey, secretKey) => dispatch(ExperimentPaneActions.loadExperiment(name, accessKey, secretKey)),
-    addExperimentName: name => dispatch(ExperimentPaneActions.addExperimentName(name)),
-    removeExperimentName: name => dispatch(ExperimentPaneActions.removeExperimentName(name))
+    addExperimentName: name => dispatch(ExperimentPaneActions.addExperimentName(name)), // TODO: don't need anymore, called in thunk
+    removeExperimentName: name => dispatch(ExperimentPaneActions.removeExperimentName(name)) // TODO: don't need anymore, called in thunk
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoadPanel);
