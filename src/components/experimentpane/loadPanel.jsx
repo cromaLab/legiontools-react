@@ -83,18 +83,20 @@ class LoadPanel extends React.Component {
         else {
             this.setState({dropdownValue: event.target.value});
 
-            // TODO: thunk selectFromExperimentNames that uses experimentName=this.state.dropdownValue in order to grab info about the currExperiment
-            // within that thunk, dispatch a SET_CURR_EXPERIMENT action
-            this.props.setCurrExperiment({
-                experimentName: event.target.value,
-                hitTitle: "",
-                hitDescription: "",
-                hitKeywords: "",
-                workerCountry: "",
-                minApproved: ""
+            // TODO: loadExperiment action
+            this.props.loadExperiment(event.target.value, this.props.tokens.accessKey, this.props.tokens.secretKey).then(() => {
+                // after currExperiment is set, use currExperiment values to populate textForm
+                this.setState({
+                    textForm: {
+                        experimentName: this.props.currExperiment.experimentName,
+                        hitTitle: this.props.currExperiment.hitTitle,
+                        hitDescription: this.props.currExperiment.hitDescription,
+                        hitKeywords: this.props.currExperiment.hitKeywords,
+                        workerCountry: this.props.currExperiment.workerCountry,
+                        minApproved: this.props.currExperiment.minApproved
+                    }
+                });
             });
-
-            // TODO: after selectFromExperimentNames Promise resolves, use currExperiment data to fill this.state.textForm
 
             if (!this.props.livePaneEnabled) {
                 this.props.enableLivePane(true);
@@ -132,7 +134,7 @@ class LoadPanel extends React.Component {
     }
 
     copyExperiment() {
-        // TODO: thunk updates DB with new experiment
+        // TODO: copyExperiment action
         // setCurrExperiment with copied values except for the unique experimentName
         this.props.setCurrExperiment({
             experimentName: this.state.copyModal.value,
@@ -169,8 +171,7 @@ class LoadPanel extends React.Component {
     }
 
     deleteExperiment() {
-        // TODO: thunk deletes experiment from DB
-
+        // TODO: deleteExperiment action
         // remove the experiment from experimentNames
         this.props.removeExperimentName(this.props.currExperiment.experimentName);
 
@@ -194,11 +195,11 @@ class LoadPanel extends React.Component {
 
         // if no currExperiment is currently set, then add the new experiment to experimentNames
         if (!this.props.currExperiment) {
+            // TODO: addExperiment action
             this.props.addExperimentName(this.state.textForm.experimentName);
         }
 
-        // TODO: thunk should save new experiment to database if no currExperiment exists, else just update existing experiment in database
-        // TODO: how should hitKeywords be represented, array or string? similar Q's for workerCountry and minApproved
+        // TODO: else, updateExperiment action
         this.props.setCurrExperiment({
             experimentName: this.state.textForm.experimentName,
             hitTitle: this.state.textForm.hitTitle,
@@ -356,6 +357,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     enableLivePane: enabled => dispatch(ExperimentPaneActions.enableLivePane(enabled)),
     setCurrExperiment: experiment => dispatch(ExperimentPaneActions.setCurrExperiment(experiment)),
+    loadExperiment: (name, accessKey, secretKey) => dispatch(ExperimentPaneActions.loadExperiment(name, accessKey, secretKey)),
     addExperimentName: name => dispatch(ExperimentPaneActions.addExperimentName(name)),
     removeExperimentName: name => dispatch(ExperimentPaneActions.removeExperimentName(name))
 })

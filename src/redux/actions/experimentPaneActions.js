@@ -51,17 +51,20 @@ export const ExperimentPaneActions = {
     },
     loadExperiment: (experimentName, accessKey, secretKey) => {
         return (dispatch) => {
+            // requests require data to be in the FormData format
+            let existingExperiment = new FormData();
+            existingExperiment.append("task", experimentName);
+            existingExperiment.append("accessKey", accessKey);
+            existingExperiment.append("secretKey", secretKey);
+
             // dispatch(experimentPaneActions.loadExperiment) will return Promise
-            return fetch(`${process.env.PUBLIC_URL}/old/Retainer/php/loadTask.php`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                },
-                body: JSON.stringify({
-                    task: experimentName,
-                    accessKey,
-                    secretKey
+            return fetch(`${process.env.PUBLIC_URL}/old/Retainer/php/loadTask.php`, 
+                {
+                    method: "POST",
+                    headers: {
+                        "Accept": ["application/json", "text/javascript"]
+                    },
+                    body: existingExperiment
                 }).then((res) => {
                     if (!res.ok) throw Error(res.statusText);
                     return res.json();
@@ -99,9 +102,17 @@ export const ExperimentPaneActions = {
                      "14":null}
                      */
                     // TODO: currExperiment should store more than just form-related information
-                    // TODO: use data to dispatch(setCurrExperiment)
+                    console.log(data);
+                    dispatch(ExperimentPaneActions.setCurrExperiment({
+                        experimentName,
+                        hitTitle: data.task_title,
+                        hitDescription: data.task_description,
+                        hitKeywords: task_keywords,
+                        workerCountry: data.country,
+                        minApproved: data.percentApproved
+                    }));
                 })
-            })
+                // TODO: catch errors?
         }
     },
     setCurrExperiment: experiment => {
