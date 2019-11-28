@@ -84,7 +84,7 @@ class LoadPanel extends React.Component {
             this.setState({dropdownValue: event.target.value});
 
             // TODO: loadExperiment action
-            this.props.loadExperiment(event.target.value, this.props.tokens.accessKey, this.props.tokens.secretKey).then(() => {
+            this.props.loadExperiment(event.target.value, this.props.tokens).then(() => {
                 // TODO: will this execute if loadExperiment throws an error
                 // after currExperiment is set, use currExperiment values to populate textForm
                 return this.setState({
@@ -218,22 +218,15 @@ class LoadPanel extends React.Component {
         }
         else {
             // TODO: updateExperiment action
-            this.props.setCurrExperiment({
-                experimentName: this.state.textForm.experimentName,
-                hitTitle: this.state.textForm.hitTitle,
-                hitDescription: this.state.textForm.hitDescription,
-                hitKeywords: this.state.textForm.hitKeywords,
-                workerCountry: this.state.textForm.workerCountry,
-                minApproved: this.state.textForm.minApproved
+            this.props.updateExperiment(this.state.textForm, this.props.tokens).then(() => {
+                // once experiment is set, enable live pane
+                if (!this.props.livePaneEnabled) {
+                    this.props.enableLivePane(true);
+                }
+
+                // TODO: does currExperiment update in time
+                this.setState({dropdownValue: this.props.currExperiment.experimentName});
             });
-
-            // once experiment is set, enable live pane
-            if (!this.props.livePaneEnabled) {
-                this.props.enableLivePane(true);
-            }
-
-            // (can't here because this.props.currExperiment isn't set yet)
-            this.setState({dropdownValue: this.state.textForm.experimentName});
         }
     }
 
@@ -301,7 +294,7 @@ class LoadPanel extends React.Component {
                             placeholder="Enter a task session name"
                             value={this.state.textForm.experimentName}
                             onChange={this.handleTextInputChange}
-                            disabled={this.props.currExperiment}
+                            disabled={this.props.currExperiment} // experimentName is used as id, cannot be changed
                         />
                     </Form.Group>
                     <Form.Group controlId="hitTitle">
@@ -376,7 +369,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     enableLivePane: enabled => dispatch(ExperimentPaneActions.enableLivePane(enabled)),
     setCurrExperiment: experiment => dispatch(ExperimentPaneActions.setCurrExperiment(experiment)),
-    loadExperiment: (name, accessKey, secretKey) => dispatch(ExperimentPaneActions.loadExperiment(name, accessKey, secretKey)),
+    loadExperiment: (name, tokens) => dispatch(ExperimentPaneActions.loadExperiment(name, tokens)),
+    updateExperiment: (experiment, tokens) => dispatch(ExperimentPaneActions.updateExperiment(experiment, tokens)),
     addExperimentName: name => dispatch(ExperimentPaneActions.addExperimentName(name)), // TODO: don't need anymore, called in thunk
     removeExperimentName: name => dispatch(ExperimentPaneActions.removeExperimentName(name)) // TODO: don't need anymore, called in thunk
 })

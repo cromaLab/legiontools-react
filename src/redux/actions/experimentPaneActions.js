@@ -49,13 +49,13 @@ export const ExperimentPaneActions = {
             error
         })
     },
-    loadExperiment: (experimentName, accessKey, secretKey) => {
+    loadExperiment: (experimentName, tokens) => {
         return (dispatch) => {
             // requests require data to be in the FormData format
-            let existingExperiment = new FormData();
-            existingExperiment.append("task", experimentName);
-            existingExperiment.append("accessKey", accessKey);
-            existingExperiment.append("secretKey", secretKey);
+            let formData = new FormData();
+            formData.append("task", experimentName);
+            formData.append("accessKey", tokens.accessKey);
+            formData.append("secretKey", tokens.secretKey);
 
             // dispatch(experimentPaneActions.loadExperiment) will return Promise
             return fetch(`${process.env.PUBLIC_URL}/old/Retainer/php/loadTask.php`, 
@@ -64,7 +64,7 @@ export const ExperimentPaneActions = {
                     headers: {
                         "Accept": ["application/json", "text/javascript"]
                     },
-                    body: existingExperiment
+                    body: formData
                 }).then((res) => {
                     if (!res.ok) throw Error(res.statusText);
                     return res.json();
@@ -80,7 +80,37 @@ export const ExperimentPaneActions = {
                         minApproved: data.percentApproved
                     }));
                 })
-                // TODO: catch errors?
+                // TODO: catch errors and dispatch LOAD_EXPERIMENT_ERROR action?
+        }
+    },
+    updateExperiment: (experiment, tokens) => {
+        return (dispatch) => {
+            let formData = new FormData();
+            formData.append("accessKey", tokens.accessKey);
+            formData.append("secretKey", tokens.secretKey);
+            formData.append("task", experiment.experimentName);
+            formData.append("taskTitle", experiment.hitTitle);
+            formData.append("taskDescription", experiment.hitDescription);
+            formData.append("taskKeywords", experiment.hitKeywords);
+            formData.append("country", experiment.workerCountry);
+            formData.append("percentApproved", experiment.minApproved); 
+
+            return fetch(`${process.env.PUBLIC_URL}/old/Retainer/php/updateTask.php`,
+                {
+                    method: "POST",
+                    body: formData
+                }).then((res) => {
+                    if (!res.ok) throw Error(res.statusText);
+                }).then(() => {
+                    dispatch(ExperimentPaneActions.setCurrExperiment({
+                        experimentName: experiment.experimentName,
+                        hitTitle: experiment.hitTitle,
+                        hitDescription: experiment.hitDescription,
+                        hitKeywords: experiment.hitKeywords,
+                        workerCountry: experiment.workerCountry,
+                        minApproved: experiment.minApproved
+                    }));
+                });
         }
     },
     setCurrExperiment: experiment => {
