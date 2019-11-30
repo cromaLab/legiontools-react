@@ -197,24 +197,15 @@ class LoadPanel extends React.Component {
         // if no currExperiment is currently set, then create the new experiment
         if (!this.props.currExperiment) {
             // TODO: addExperiment action
-            this.props.addExperimentName(this.state.textForm.experimentName);
-
-            this.props.setCurrExperiment({
-                experimentName: this.state.textForm.experimentName,
-                hitTitle: this.state.textForm.hitTitle,
-                hitDescription: this.state.textForm.hitDescription,
-                hitKeywords: this.state.textForm.hitKeywords,
-                workerCountry: this.state.textForm.workerCountry,
-                minApproved: this.state.textForm.minApproved
-            });
-
+            this.props.addExperiment(this.state.textForm, this.props.tokens).then(() => {
                 // once experiment is set, enable live pane
-            if (!this.props.livePaneEnabled) {
-                this.props.enableLivePane(true);
-            }
+                if (!this.props.livePaneEnabled) {
+                    this.props.enableLivePane(true);
+                }
 
-            // (can't here because this.props.currExperiment isn't set yet)
-            this.setState({dropdownValue: this.state.textForm.experimentName});
+                // update dropdownValue with currExperiment's name
+                this.setState({dropdownValue: this.props.currExperiment.experimentName});
+            });
         }
         else {
             // TODO: updateExperiment action
@@ -368,6 +359,7 @@ const mapDispatchToProps = dispatch => ({
     setCurrExperiment: experiment => dispatch(ExperimentPaneActions.setCurrExperiment(experiment)),
     loadExperiment: (name, tokens) => dispatch(ExperimentPaneActions.loadExperiment(name, tokens)),
     updateExperiment: (experiment, tokens) => dispatch(ExperimentPaneActions.updateExperiment(experiment, tokens)),
+    addExperiment: (experiment, tokens) => dispatch(ExperimentPaneActions.addExperiment(experiment, tokens)),
     addExperimentName: name => dispatch(ExperimentPaneActions.addExperimentName(name)), // TODO: don't need anymore, called in thunk
     removeExperimentName: name => dispatch(ExperimentPaneActions.removeExperimentName(name)) // TODO: don't need anymore, called in thunk
 })
