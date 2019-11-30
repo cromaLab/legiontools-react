@@ -136,31 +136,19 @@ class LoadPanel extends React.Component {
 
     copyExperiment() {
         // TODO: copyExperiment action
-        // setCurrExperiment with copied values except for the unique experimentName
-        this.props.setCurrExperiment({
-            experimentName: this.state.copyModal.value,
-            hitTitle: this.props.currExperiment.hitTitle,
-            hitDescription: this.props.currExperiment.hitDescription,
-            hitKeywords: this.props.currExperiment.hitKeywords,
-            workerCountry: this.props.currExperiment.workerCountry,
-            minApproved: this.props.currExperiment.minApproved
+        this.props.copyExperiment(this.props.currExperiment, this.state.copyModal.value, this.props.tokens).then(() => {
+            // update dropdownValue with new experimentName
+            this.setState({dropdownValue: this.props.currExperiment.experimentName});
+
+            // update text form with new experimentName
+            this.setState({
+                textForm: {
+                    ...this.props.currExperiment
+                }
+            });
+
+            this.closeCopyModal();
         });
-
-        // update experimentNames with new experimentName
-        this.props.addExperimentName(this.state.copyModal.value);
-
-        // update dropdownValue with new experimentName
-        this.setState({dropdownValue: this.state.copyModal.value});
-
-        // update text form with new experimentName
-        this.setState({
-            textForm: {
-                ...this.props.currExperiment,
-                experimentName: this.state.copyModal.value
-            }
-        });
-
-        this.closeCopyModal();
     }
 
     openDeleteModal() {
@@ -224,6 +212,7 @@ class LoadPanel extends React.Component {
                 <Modal show={this.state.copyModal.show}>
                     <ModalHeader closeButton>Please enter a unique new task name</ModalHeader>
                     <ModalBody>
+                        {/* TODO: validate that modal value isn't empty and is unique before proceeding */}
                         <Form onSubmit={this.copyExperiment}>
                             <Form.Control
                                 required
@@ -360,7 +349,7 @@ const mapDispatchToProps = dispatch => ({
     loadExperiment: (name, tokens) => dispatch(ExperimentPaneActions.loadExperiment(name, tokens)),
     updateExperiment: (experiment, tokens) => dispatch(ExperimentPaneActions.updateExperiment(experiment, tokens)),
     addExperiment: (experiment, tokens) => dispatch(ExperimentPaneActions.addExperiment(experiment, tokens)),
-    addExperimentName: name => dispatch(ExperimentPaneActions.addExperimentName(name)), // TODO: don't need anymore, called in thunk
+    copyExperiment: (originalExperiment, copyName, tokens) => dispatch(ExperimentPaneActions.copyExperiment(originalExperiment, copyName, tokens)),
     removeExperimentName: name => dispatch(ExperimentPaneActions.removeExperimentName(name)) // TODO: don't need anymore, called in thunk
 })
 

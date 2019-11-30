@@ -111,7 +111,7 @@ export const ExperimentPaneActions = {
                     workerCountry: experiment.workerCountry,
                     minApproved: experiment.minApproved
                 }));
-            });
+            })
         }
     },
     addExperiment: (experiment, tokens) => {
@@ -137,7 +137,7 @@ export const ExperimentPaneActions = {
             }).then(() => {
                 // TODO: should be okay, double check
                 dispatch(ExperimentPaneActions.addExperimentName(experiment.experimentName));
-                
+
                 dispatch(ExperimentPaneActions.setCurrExperiment({
                     experimentName: experiment.experimentName,
                     hitTitle: experiment.hitTitle,
@@ -146,7 +146,39 @@ export const ExperimentPaneActions = {
                     workerCountry: experiment.workerCountry,
                     minApproved: experiment.minApproved
                 }));
-            });
+            })
+        }
+    },
+    copyExperiment: (originalExperiment, copyName, tokens) => {
+        return (dispatch) => {
+            let formData = new FormData();
+            formData.append("accessKey", tokens.accessKey);
+            formData.append("secretKey", tokens.secretKey);
+            formData.append("task", originalExperiment.experimentName);
+            formData.append("newTask", copyName);
+
+            return fetch(`${process.env.PUBLIC_URL}/old/Retainer/php/copyExperiment.php`, {
+                method: "POST",
+                headers: {
+                            "Accept": "text/plain"
+                         },
+                body: formData
+            }).then((res) => {
+                if (!res.ok) throw Error(res.statusText);
+            }).then(() => {
+                // TODO: should be okay, double check
+                dispatch(ExperimentPaneActions.addExperimentName(copyName));
+
+                // TODO: check if possible to minimize copying
+                dispatch(ExperimentPaneActions.setCurrExperiment({
+                    experimentName: copyName,
+                    hitTitle: originalExperiment.hitTitle,
+                    hitDescription: originalExperiment.hitDescription,
+                    hitKeywords: originalExperiment.hitKeywords,
+                    workerCountry: originalExperiment.workerCountry,
+                    minApproved: originalExperiment.minApproved
+                }));
+            })
         }
     },
     setCurrExperiment: experiment => {
