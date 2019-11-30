@@ -134,7 +134,9 @@ class LoadPanel extends React.Component {
         });
     }
 
-    copyExperiment() {
+    copyExperiment(event) {
+        event.preventDefault();
+
         // TODO: copyExperiment action
         this.props.copyExperiment(this.props.currExperiment, this.state.copyModal.value, this.props.tokens).then(() => {
             // update dropdownValue with new experimentName
@@ -209,24 +211,25 @@ class LoadPanel extends React.Component {
     render() {
         return (
             <div className="mt-3">
-                <Modal show={this.state.copyModal.show}>
+                <Modal show={this.state.copyModal.show} onHide={this.closeCopyModal}>
                     <ModalHeader closeButton>Please enter a unique new task name</ModalHeader>
                     <ModalBody>
                         {/* TODO: validate that modal value isn't empty and is unique before proceeding */}
                         <Form onSubmit={this.copyExperiment}>
-                            <Form.Control
-                                required
-                                type="text"
-                                placeholder="Task session name"
-                                value={this.modalValue}
-                                onChange={this.handleCopyModalChange}
-                            />
+                            <Form.Group controlId="copyExperiment">
+                                <Form.Control
+                                    required
+                                    type="text"
+                                    placeholder="Task session name"
+                                    value={this.modalValue}
+                                    onChange={this.handleCopyModalChange}
+                                />
+                            </Form.Group>
+                                {/* TODO: margin utility doesn't work because of default btn styling */}
+                                <Button className="m-0" variant="primary" type="submit">OK</Button>
+                                <Button className="m-0" variant="secondary" onClick={this.closeCopyModal}>Cancel</Button>
                         </Form>
                     </ModalBody>
-                    <ModalFooter className="p-0">
-                        <Button variant="primary" onClick={this.copyExperiment}>OK</Button>
-                        <Button variant="secondary" onClick={this.closeCopyModal}>Cancel</Button>
-                    </ModalFooter>
                 </Modal>
 
                 <Modal show={this.state.showDeleteModal}>
