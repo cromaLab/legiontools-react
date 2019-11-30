@@ -223,9 +223,6 @@ class LoadPanel extends React.Component {
                 if (!this.props.livePaneEnabled) {
                     this.props.enableLivePane(true);
                 }
-
-                // TODO: does currExperiment update in time
-                this.setState({dropdownValue: this.props.currExperiment.experimentName});
             });
         }
     }
