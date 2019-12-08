@@ -181,6 +181,61 @@ export const ExperimentPaneActions = {
             })
         }
     },
+    deleteExperiment: (experimentName, tokens) => {
+        return (dispatch) => {
+            // same data is required for stopRecruiting and deleteExperiment
+            let formData = new FormData();
+            formData.append("accessKey", tokens.accessKey);
+            formData.append("secretKey", tokens.secretKey);
+            formData.append("task", experimentName);
+
+            return fetch(`${process.env.PUBLIC_URL}/old/Retainer/php/stopRecruiting.php`, {
+                method: "POST",
+                headers: {
+                            "Accept": "text/plain"
+                         },
+                body: formData
+            }).then((res) => {
+                if (!res.ok) throw Error(res.statusText);
+            }).then(() => {
+                // TODO: handle stopRecruiting, likely with another Redux action
+                // TODO: stopRecruiting and deleteExperiment currently seem in tension
+                // one updates Retainer table where task id matches and
+                // the other deletes everything from Retainer table that matches the task id
+
+                // disables the Stop Recruiting button
+                // Start Recruiting button's text is changed to "Please Wait While Recruiting is Stopped"
+                // re-enable the Sandbox/Live mode toggle (that would've previously be disabled by a startRecruiting request)
+
+                // also checks at intervals if the task has actually stoppedRecruiting via POST queries to loadTask.php
+                // if task.done === "1", reset the Start Recruiting/Stop Recruiting button's text, enable Start Recruiting button, disable Stop Recruiting button
+            }).then(() => {
+                // deleteExperiment
+                return fetch(`${process.env.PUBLIC_URL}/old/Retainer/php/deleteExperiment.php`, {
+                    method: "POST",
+                    headers: {
+                                "Accept": "text/plain"
+                             },
+                    body: formData
+                })
+            }).then((res) => {
+                if (!res.ok) throw Error(res.statusText);
+            }).then(() => {
+                // handle deleteExperiment
+
+                // update list of experiments
+                dispatch(ExperimentPaneActions.removeExperimentName(experimentName));
+
+                // reset the currExperiment
+                dispatch(ExperimentPaneActions.setCurrExperiment(null));
+
+                // disable the Live pane
+                dispatch(ExperimentPaneActions.enableLivePane(false));
+
+                // TODO: reset Live pane values as well
+            })
+        }
+    },
     setCurrExperiment: experiment => {
         return ({
             type: experimentPaneTypes.SET_CURR_EXPERIMENT,

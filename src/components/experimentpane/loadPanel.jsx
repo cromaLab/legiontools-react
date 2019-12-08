@@ -32,7 +32,7 @@ class LoadPanel extends React.Component {
         };
 
         // helper func to reduce duplication
-        this.resetState = this.resetState.bind(this);
+        this.resetForms = this.resetForms.bind(this);
 
         // handles text input form
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -53,10 +53,7 @@ class LoadPanel extends React.Component {
         this.deleteExperiment = this.deleteExperiment.bind(this);
     }
 
-    resetState() {
-        // clear out the currExperiment, allowing users to create a new one
-        this.props.setCurrExperiment(null);
-
+    resetForms() {
         // deselect currExperiment in the dropdown menu
         this.setState({dropdownValue: "Select an experiment name"});
 
@@ -71,14 +68,17 @@ class LoadPanel extends React.Component {
                 minApproved: ""
             }
         });
-
-        // disable the live pane
-        this.props.enableLivePane(false);
     }
 
     handleDropdownChange(event) {
         if (event.target.value === "Select an experiment name") {
-            this.resetState();
+            this.resetForms();
+
+            // clear out the currExperiment, allowing users to create a new one
+            this.props.setCurrExperiment(null);
+
+            // disable the live pane
+            this.props.enableLivePane(false);
         }
         else {
             this.setState({dropdownValue: event.target.value});
@@ -163,12 +163,11 @@ class LoadPanel extends React.Component {
 
     deleteExperiment() {
         // TODO: deleteExperiment action
-        // remove the experiment from experimentNames
-        this.props.removeExperimentName(this.props.currExperiment.experimentName);
+        this.props.deleteExperiment(this.props.currExperiment.experimentName, this.props.tokens).then(() => {
+            this.resetForms();
 
-        this.resetState();
-
-        this.closeDeleteModal();
+            this.closeDeleteModal();
+        });
     }
 
     handleTextInputChange(event) {
@@ -214,7 +213,7 @@ class LoadPanel extends React.Component {
                 <Modal show={this.state.copyModal.show} onHide={this.closeCopyModal}>
                     <ModalHeader closeButton>Please enter a unique new task name</ModalHeader>
                     <ModalBody>
-                        {/* TODO: validate that modal value isn't empty and is unique before proceeding */}
+                        {/* TODO: validate that modal value is unique before proceeding */}
                         <Form onSubmit={this.copyExperiment}>
                             <Form.Group controlId="copyExperiment">
                                 <Form.Control
@@ -265,6 +264,7 @@ class LoadPanel extends React.Component {
                 <h3>Or create a new experiment</h3>
 
                 {/* TODO: add validation (minApproved should be number, etc) */}
+                {/* TODO: use this.props.currExperiment's value as the defaultValue for this form? */}
                 <Form onSubmit={this.handleSubmit}>
                     <Form.Group controlId="experimentName">
                         <Form.Label>Experiment Name (Remember This)</Form.Label>
@@ -353,7 +353,7 @@ const mapDispatchToProps = dispatch => ({
     updateExperiment: (experiment, tokens) => dispatch(ExperimentPaneActions.updateExperiment(experiment, tokens)),
     addExperiment: (experiment, tokens) => dispatch(ExperimentPaneActions.addExperiment(experiment, tokens)),
     copyExperiment: (originalExperiment, copyName, tokens) => dispatch(ExperimentPaneActions.copyExperiment(originalExperiment, copyName, tokens)),
-    removeExperimentName: name => dispatch(ExperimentPaneActions.removeExperimentName(name)) // TODO: don't need anymore, called in thunk
+    deleteExperiment: (name, tokens) => dispatch(ExperimentPaneActions.deleteExperiment(name, tokens))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoadPanel);
