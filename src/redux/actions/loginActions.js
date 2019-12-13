@@ -38,9 +38,21 @@ export const LoginActions = {
     },
     getSessionList: tokens => {
         return (dispatch) => {
-            // taken from https://cromalab.net/InProgress/LegionToolsUpdatedBeta/getSessionsList.php when accessKey: 1 and secretKey: 1
-            // TODO: why does getSessionsList return it in this format
-            return Promise.resolve([{"task":"Testing","0":"Testing"},{"task":"Testing2","0":"Testing2"},{"task":"H","0":"H"},{"task":"Test2","0":"Test2"}]).then((data) => {
+            let formData = new FormData();
+            formData.append("accessKey", tokens.accessKey);
+            formData.append("secretKey", tokens.secretKey);
+
+            return fetch(`${process.env.PUBLIC_URL}/old/Retainer/php/getSessionsList.php`, {
+                method: "POST",
+                headers: {
+                            "Accept": ["application/json", "text/javascript"]
+                         },
+                body: formData
+            }).then((res) => {
+                if (!res.ok) throw Error(res.statusText);
+                
+                return res.json();
+            }).then((data) => {
                 // TODO: is null check necessary -- if accessKey and secretKey represent new user, getSessionsList will return [] 
                 let names = data ? data.map(task => task.task) : data;
                 dispatch(ExperimentPaneActions.initExperimentNames(names));
